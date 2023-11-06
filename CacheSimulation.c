@@ -4,14 +4,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+enum replacementStrategy {LFU, LRU};
+
 struct cache {
   struct set *sets;
   int numberOfSets;
   int numberOfLines;
   int blockSize;
   int numberOfPhysicalAddressBits;
-  // 0 if LFU or 1 if LRU
-  short replacementPreference;
+  enum replacementStrategy replacementPreference;
   int numberOfCycles;
   int numberOfMisses;
   int numberOfHits;
@@ -66,9 +67,9 @@ void buildCache() {
   scanf("%s", replacementPolicy);
 
   if (strcmp("LFU", replacementPolicy) == 0) {
-    cache->replacementPreference = 0;
+    cache->replacementPreference = LFU;
   } else {
-    cache->replacementPreference = 1;
+    cache->replacementPreference = LRU;
   }
 
   int hitTime;
@@ -136,7 +137,7 @@ void buildCache() {
           // replacement strategy
           int lineToBeReplaced = 0;
           // if LFU
-          if (cache->replacementPreference == 0) {
+          if (cache->replacementPreference == LFU) {
             for (int i = 1; i < cache->numberOfLines; i++) {
               if (cache->sets[setNum].lines[i].useFrequency < cache->sets[setNum].lines[lineToBeReplaced].useFrequency) {
                 lineToBeReplaced = i;
@@ -144,7 +145,7 @@ void buildCache() {
             }
           }
           // if LRU
-          if (cache->replacementPreference == 1) {
+          if (cache->replacementPreference == LRU) {
             for (int i = 1; i < cache->numberOfLines; i++) {
               if (cache->sets[setNum].lines[i].cycleLastUsed < cache->sets[setNum].lines[lineToBeReplaced].cycleLastUsed) {
                 lineToBeReplaced = i;
