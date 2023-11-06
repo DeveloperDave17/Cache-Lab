@@ -1,4 +1,5 @@
 #include <math.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,8 +25,7 @@ struct line {
   uint64_t addressesWithinLine;
   int useFrequency;
   int cycleLastUsed;
-  // 0 if this line was never loaded, 1 if otherwise
-  short warmedUp;
+  bool warmedUp;
 };
 
 struct set {
@@ -91,7 +91,7 @@ void buildCache() {
     // Setup lines for each set
     for (int lineNum = 0; lineNum < numberOfLines; lineNum++) {
       cache->sets[setNum].lines[lineNum].addressesWithinLine = 0;
-      cache->sets[setNum].lines[lineNum].warmedUp = 0;
+      cache->sets[setNum].lines[lineNum].warmedUp = false;
       cache->sets[setNum].lines[lineNum].cycleLastUsed = 0;
       cache->sets[setNum].lines[lineNum].useFrequency = 0;
     }
@@ -116,7 +116,7 @@ void buildCache() {
       int setNum = setBits >> blockBitCount;
       for (int lineNum = 0; lineNum < cache->numberOfLines; lineNum++) {
         if (cache->sets[setNum].lines[lineNum].warmedUp == 0) {
-          cache->sets[setNum].lines[lineNum].warmedUp = 1;
+          cache->sets[setNum].lines[lineNum].warmedUp = true;
           cache->sets[setNum].lines[lineNum].addressesWithinLine = addressBitsWithoutBlockBits;
           cache->sets[setNum].lines[lineNum].useFrequency++;
           cache->sets[setNum].lines[lineNum].cycleLastUsed = cache->numberOfCycles;
