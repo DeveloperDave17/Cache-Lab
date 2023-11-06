@@ -32,21 +32,19 @@ struct set {
   struct line *lines;
 };
 
-void buildCache();
-void simulate();
-void getHexAddressBits(char *userInput, uint64_t *inputAddress);
-void setTheCacheFree();
-
-struct cache *cache;
+void buildCache(struct cache *cache);
+void simulate(struct cache *cache);
+void getHexAddressBits(char *userInput, uint64_t *inputAddress, struct cache *cache);
+void setTheCacheFree(struct cache *cache);
 
 int main() {
-  buildCache();
-  simulate();
-  setTheCacheFree();
+  struct cache *cache = malloc(sizeof(struct cache));
+  buildCache(cache);
+  simulate(cache);
+  setTheCacheFree(cache);
 }
 
-void buildCache() {
-  cache = malloc(sizeof(struct cache));
+void buildCache(struct cache *cache) {
   int numberOfSets;
   scanf("%d", &numberOfSets);
   cache->numberOfSets = numberOfSets;
@@ -98,7 +96,7 @@ void buildCache() {
   }
 }
 
-  void simulate() {
+  void simulate(struct cache* cache) {
     int blockBitCount = log(cache->blockSize) / log(2);
     uint64_t blockBitMask = (1 << blockBitCount) - 1;
     int setBitCount = log(cache->numberOfSets) / log(2);
@@ -110,7 +108,7 @@ void buildCache() {
     scanf("%s", userInput);
     while (strcmp("-1", userInput) != 0) {
       uint64_t inputAddress;
-      getHexAddressBits(userInput, &inputAddress);
+      getHexAddressBits(userInput, &inputAddress, cache);
       uint64_t addressBitsWithoutBlockBits = inputAddress & ~blockBitMask;
       uint64_t setBits = inputAddress & setBitMask;
       int setNum = setBits >> blockBitCount;
@@ -171,7 +169,7 @@ void buildCache() {
     printf("%d\n", cache->numberOfCycles);
   }
 
-  void getHexAddressBits(char *userInput, uint64_t *inputAddress) {
+  void getHexAddressBits(char *userInput, uint64_t *inputAddress, struct cache *cache) {
     *inputAddress = 0;
     int bitsInHex = 4;
     int hexNumArrayOffset = 1;
@@ -215,7 +213,7 @@ void buildCache() {
   }
 
   // Sometimes the best thing you can do for those you love is to let them roam free.
-  void setTheCacheFree() {
+  void setTheCacheFree(struct cache *cache) {
     for (int setNum = 0; setNum < cache->numberOfSets; setNum++) {
       free(cache->sets[setNum].lines);
     }
